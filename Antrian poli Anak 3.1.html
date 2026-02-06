@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>TV Auto Reload</title>
+
+    <!-- Fullscreen & no zoom -->
+    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, user-scalable=no">
+
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background: black;
+            overflow: hidden;
+        }
+        iframe {
+            width: 100vw;
+            height: 100vh;
+            border: none;
+        }
+    </style>
+</head>
+
+<body>
+    <iframe id="tvFrame"></iframe>
+
+    <script>
+        const URL = "http://10.5.1.11/antrian-new/pasien-new/?tv=3.2";
+        const INTERVAL = 120000; // waktu reload
+        const FALLBACK_TIMEOUT = 15000; // 15 detik cek error
+
+        const frame = document.getElementById("tvFrame");
+
+        function loadPage() {
+            frame.src = URL + "&_ts=" + Date.now(); // anti-cache
+        }
+
+        // Load pertama
+        loadPage();
+
+        // Auto reload looping tiap 30 detik
+        setInterval(() => {
+            location.reload();
+        }, INTERVAL);
+
+        // Fallback kalau iframe error / tidak load
+        setTimeout(() => {
+            try {
+                if (!frame.contentWindow || frame.contentDocument.readyState !== "complete") {
+                    location.reload();
+                }
+            } catch (e) {
+                // Kalau kena cross-origin error → reload aman
+                location.reload();
+            }
+        }, FALLBACK_TIMEOUT);
+    </script>
+</body>
+</html>
